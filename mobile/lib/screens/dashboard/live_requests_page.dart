@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:audioplayers/audioplayers.dart'; // 🔊 Sound player
+import 'package:audioplayers/audioplayers.dart';
 
 class LiveRequestsPage extends StatefulWidget {
   const LiveRequestsPage({super.key});
@@ -15,7 +15,7 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
   bool loading = true;
   List<dynamic> bookings = [];
   RealtimeChannel? bookingsChannel;
-  final AudioPlayer _audioPlayer = AudioPlayer(); // 🔊 for notifications
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -82,7 +82,6 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
       final booking = bookings.firstWhere((b) => b['id'] == id);
       String newStatus;
 
-      // If company already confirmed, final status = completed
       if ((booking['status'] ?? '').toString().toLowerCase() ==
           'company_confirmed') {
         newStatus = 'completed';
@@ -272,6 +271,7 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Status + Company
                               Row(
                                 children: [
                                   Container(
@@ -289,11 +289,16 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
                                           fontSize: 12),
                                     ),
                                   ),
-                                  const Spacer(),
-                                  Text(company,
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      company,
                                       style: const TextStyle(
                                           color: Colors.white70,
-                                          fontStyle: FontStyle.italic)),
+                                          fontStyle: FontStyle.italic),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 10),
@@ -312,12 +317,12 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
                                       const TextStyle(color: Colors.white70)),
                               const SizedBox(height: 14),
                               _buildProgressTimeline(step),
-
-                              // Buttons: Cancel, Pay, Confirm Pickup
                               const SizedBox(height: 12),
+
+                              // Buttons
                               Row(
                                 children: [
-                                  if (status.toLowerCase() == 'pending') ...[
+                                  if (status.toLowerCase() == 'pending')
                                     Expanded(
                                       child: ElevatedButton.icon(
                                         onPressed: () async {
@@ -374,12 +379,20 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
                                         ),
                                       ),
                                     ),
-                                  ],
-                                  if (canPay) ...[
+                                  if (canPay) const SizedBox(width: 8),
+                                  if (canPay)
                                     Expanded(
                                       child: ElevatedButton.icon(
                                         onPressed: () {
-                                          // TODO: Navigate to payment page
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Payment button tapped! (Paystack disabled for testing)'),
+                                              backgroundColor:
+                                                  Colors.orangeAccent,
+                                            ),
+                                          );
                                         },
                                         icon: const Icon(Icons.payment,
                                             color: Colors.white),
@@ -387,13 +400,15 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.orangeAccent,
                                           shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                  if (canConfirmPickup) ...[
+                                  if (canConfirmPickup)
+                                    const SizedBox(width: 8),
+                                  if (canConfirmPickup)
                                     Expanded(
                                       child: ElevatedButton.icon(
                                         onPressed: () async {
@@ -450,7 +465,6 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
                                         ),
                                       ),
                                     ),
-                                  ],
                                 ],
                               ),
                             ],
@@ -472,44 +486,42 @@ class _LiveRequestsPageState extends State<LiveRequestsPage> {
     ];
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(steps.length, (index) {
-        final isActive = index < activeStep;
-        final isLast = index == steps.length - 1;
+      children: List.generate(steps.length * 2 - 1, (index) {
+        if (index.isEven) {
+          final stepIndex = index ~/ 2;
+          final isActive = stepIndex < activeStep;
 
-        return Expanded(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(steps[index]['icon'] as IconData,
-                      color: isActive ? Colors.redAccent : Colors.white24,
-                      size: 22),
-                  if (!isLast)
-                    Expanded(
-                      child: Container(
-                        height: 2,
-                        color: isActive
-                            ? Colors.redAccent
-                            : Colors.white24.withOpacity(0.2),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  steps[index]['label'] as String,
+          return Expanded(
+            child: Column(
+              children: [
+                Icon(
+                  steps[stepIndex]['icon'] as IconData,
+                  color: isActive ? Colors.redAccent : Colors.white24,
+                  size: 22,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  steps[stepIndex]['label'] as String,
                   style: TextStyle(
                     color: isActive ? Colors.white : Colors.white38,
                     fontSize: 10,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
-          ),
-        );
+              ],
+            ),
+          );
+        } else {
+          final lineIndex = (index - 1) ~/ 2;
+          final isActive = lineIndex < activeStep - 1;
+
+          return Container(
+            width: 20,
+            height: 2,
+            color:
+                isActive ? Colors.redAccent : Colors.white24.withOpacity(0.2),
+          );
+        }
       }),
     );
   }

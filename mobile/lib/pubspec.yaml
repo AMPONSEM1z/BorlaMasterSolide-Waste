@@ -34,7 +34,7 @@ dependencies:
   audioplayers: ^6.1.0
 
   # 💳 Payment Integration (Paystack)
-  flutter_paystack_plus: ^1.0.1
+  flutter_paystack_plus: ^2.3.0
 
 dev_dependencies:
   flutter_test:

@@ -250,10 +250,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_paystack_plus
-      sha256: "33697a55932a4164b606e1161d86c51c65d78f9be00beb2659aca15c8fd6a140"
+      sha256: af8a7dfb644004afa7ae259b966f3116832412ec17870fbfada8276cbba87265
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "2.3.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -404,10 +404,10 @@ packages:
     dependency: transitive
     description:
       name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      sha256: "53385261521cc4a0c4658fd0ad07a7d14591cf8fc33abbceae306ddb974888dc"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.7"
+    version: "0.7.2"
   jwt_decode:
     dependency: transitive
     description:
